@@ -2,23 +2,32 @@ using UnityEngine;
 
 public class PlayerController : MonoBehaviour
 {
-    [Header("Movement")]
-    public float maxSpeed = 8f;
-    public float acceleration = 20f;
-    public float deceleration = 25f;
+    [Header("Wheel Joint References")]
+    public WheelJoint2D backWheelJoint;
+    public WheelJoint2D frontWheelJoint;
 
-    [Header("Jump")]
-    public float jumpForce = 15f;
-    public Transform groundCheck;
-    public float checkRadius = 0.3f;
-    public LayerMask groundLayer;
+    [Header("Motor & Speed Settings")]
+    [Tooltip("Kecepatan maksimal putaran roda (derajat/detik)")]
+    public float maxMotorSpeed = 1200f;
+    [Tooltip("Torsi maksimal motor roda (daya dorong)")]
+    public float maxMotorTorque = 1500f;
+    [Tooltip("Kecepatan akselerasi gas (derajat/detik^2)")]
+    public float accelerationRate = 2500f;
+    [Tooltip("Kecepatan perlambatan/pengereman (derajat/detik^2)")]
+    public float decelerationRate = 3500f;
+
+    [Header("Stability Settings")]
+    [Tooltip("Sudut kemiringan maksimal sebelum mobil dianggap terbalik (derajat)")]
+    public float maxTiltAngle = 80f;
+    [Tooltip("Kekuatan torsi penyeimbang agar bodi mobil stabil tegak")]
+    public float uprightStiffness = 6f;
 
     [Header("Audio")]
     public AudioSource engineAudio;
 
     private Rigidbody2D rb;
-    private float currentSpeed;
-    private bool isGrounded;
+    private float currentMotorSpeed = 0f;
+    private bool isFlipped;
 
     void Start()
     {
@@ -27,67 +36,92 @@ public class PlayerController : MonoBehaviour
 
     void Update()
     {
-        // Cek apakah menyentuh tanah
-        isGrounded = Physics2D.OverlapCircle(
-            groundCheck.position,
-            checkRadius,
-            groundLayer);
-
-        if (Input.GetKeyDown(KeyCode.Space))
-        {
-            Debug.Log("Grounded = " + isGrounded);
-        }
+        // Cek kemiringan bodi mobil terhadap vertikal
+        float tiltAngle = Vector2.Angle(transform.up, Vector2.up);
+        isFlipped = tiltAngle > maxTiltAngle;
 
         float input = Input.GetAxisRaw("Horizontal");
 
-        // Gerakan
-        if (input != 0)
+        // Kelola suara mesin dengan kehalusan pitch
+        if (engineAudio != null)
         {
-            currentSpeed = Mathf.MoveTowards(
-                currentSpeed,
-                input * maxSpeed,
-                acceleration * Time.deltaTime);
-
-            if (!engineAudio.isPlaying)
-                engineAudio.Play();
-        }
-        else
-        {
-            currentSpeed = Mathf.MoveTowards(
-                currentSpeed,
-                0,
-                deceleration * Time.deltaTime);
-
-            if (engineAudio.isPlaying)
-                engineAudio.Stop();
-        }
-
-        // Loncat
-        if (Input.GetKeyDown(KeyCode.Space) && isGrounded)
-        {
-            rb.linearVelocity = new Vector2(rb.linearVelocity.x, 0f);
-            rb.AddForce(Vector2.up * jumpForce, ForceMode2D.Impulse);
+            if (!isFlipped && input != 0)
+            {
+                if (!engineAudio.isPlaying) engineAudio.Play();
+                float targetPitch = Mathf.Lerp(0.8f, 1.4f, Mathf.Abs(currentMotorSpeed) / maxMotorSpeed);
+                engineAudio.pitch = Mathf.Lerp(engineAudio.pitch, targetPitch, Time.deltaTime * 5f);
+            }
+            else
+            {
+                engineAudio.pitch = Mathf.Lerp(engineAudio.pitch, 0.8f, Time.deltaTime * 5f);
+                if (engineAudio.isPlaying && Mathf.Abs(currentMotorSpeed) < 50f)
+                    engineAudio.Stop();
+            }
         }
     }
 
     void FixedUpdate()
     {
-        rb.linearVelocity = new Vector2(currentSpeed, rb.linearVelocity.y);
+        float input = Input.GetAxisRaw("Horizontal");
 
-        if (engineAudio != null)
+        if (isFlipped)
         {
-            engineAudio.pitch = Mathf.Lerp(
-                0.8f,
-                1.3f,
-                Mathf.Abs(currentSpeed) / maxSpeed);
+            currentMotorSpeed = 0f;
+            DisableMotors();
+            return;
         }
+
+        // Hitung target kecepatan motor roda dengan halus (Ramping)
+        float targetSpeed = 0f;
+        if (input != 0)
+        {
+            targetSpeed = -input * maxMotorSpeed;
+            currentMotorSpeed = Mathf.MoveTowards(currentMotorSpeed, targetSpeed, accelerationRate * Time.fixedDeltaTime);
+        }
+        else
+        {
+            currentMotorSpeed = Mathf.MoveTowards(currentMotorSpeed, 0f, decelerationRate * Time.fixedDeltaTime);
+        }
+
+        // Terapkan motor roda jika berputar
+        if (Mathf.Abs(currentMotorSpeed) > 10f)
+        {
+            SetWheelMotor(backWheelJoint, currentMotorSpeed, maxMotorTorque);
+            SetWheelMotor(frontWheelJoint, currentMotorSpeed, maxMotorTorque);
+        }
+        else
+        {
+            DisableMotors();
+        }
+
+        // Penyeimbang otomatis kemiringan bodi
+        if (!isFlipped && uprightStiffness > 0)
+        {
+            float zRotation = transform.eulerAngles.z;
+            if (zRotation > 180f) zRotation -= 360f;
+            rb.AddTorque(-zRotation * uprightStiffness);
+        }
+    }
+
+    private void SetWheelMotor(WheelJoint2D joint, float speed, float torque)
+    {
+        if (joint == null) return;
+        joint.useMotor = true;
+        JointMotor2D motor = joint.motor;
+        motor.motorSpeed = speed;
+        motor.maxMotorTorque = torque;
+        joint.motor = motor;
+    }
+
+    private void DisableMotors()
+    {
+        if (backWheelJoint != null) backWheelJoint.useMotor = false;
+        if (frontWheelJoint != null) frontWheelJoint.useMotor = false;
     }
 
     void OnDrawGizmosSelected()
     {
-        if (groundCheck == null) return;
-
-        Gizmos.color = Color.red;
-        Gizmos.DrawWireSphere(groundCheck.position, checkRadius);
+        Gizmos.color = isFlipped ? Color.red : Color.green;
+        Gizmos.DrawRay(transform.position, transform.up * 1.5f);
     }
 }
