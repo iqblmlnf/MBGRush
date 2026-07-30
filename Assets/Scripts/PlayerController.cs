@@ -29,9 +29,35 @@ public class PlayerController : MonoBehaviour
     private float currentMotorSpeed = 0f;
     private bool isFlipped;
 
+    private float flippedTimer = 0f;
+    private bool isGameOverTriggered = false;
+
+    [Header("Game Over Settings")]
+    [Tooltip("Waktu (detik) posisi terbalik sebelum Game Over muncul")]
+    public float timeToGameOverWhenFlipped = 1.8f;
+
+    [Header("Fuel Settings")]
+    [Tooltip("Kapasitas bensin maksimal")]
+    public float maxFuel = 100f;
+    [Tooltip("Kecepatan berkurangnya bensin (per detik)")]
+    public float fuelDepletionRate = 7f;
+    [Tooltip("Referensi Slider UI Bensin di Canvas HUD")]
+    public UnityEngine.UI.Slider fuelSlider;
+
+    private float currentFuel;
+    private bool isOutOfFuel = false;
+
     void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+
+        // Inisialisasi bensin
+        currentFuel = maxFuel;
+        if (fuelSlider != null)
+        {
+            fuelSlider.maxValue = maxFuel;
+            fuelSlider.value = currentFuel;
+        }
     }
 
     void Update()
@@ -39,6 +65,46 @@ public class PlayerController : MonoBehaviour
         // Cek kemiringan bodi mobil terhadap vertikal
         float tiltAngle = Vector2.Angle(transform.up, Vector2.up);
         isFlipped = tiltAngle > maxTiltAngle;
+
+        // Logika Game Over saat mobil terbalik (seperti Hill Climb Racing)
+        if (isFlipped && !isGameOverTriggered)
+        {
+            flippedTimer += Time.deltaTime;
+            if (flippedTimer >= timeToGameOverWhenFlipped)
+            {
+                isGameOverTriggered = true;
+                if (GameUIManager.instance != null)
+                {
+                    GameUIManager.instance.ShowGameOver();
+                }
+            }
+        }
+        else
+        {
+            flippedTimer = 0f;
+        }
+
+        // Logika Pengurangan Bensin
+        if (!isGameOverTriggered && Time.timeScale > 0)
+        {
+            currentFuel -= fuelDepletionRate * Time.deltaTime;
+            if (fuelSlider != null)
+            {
+                fuelSlider.value = currentFuel;
+            }
+
+            if (currentFuel <= 0 && !isOutOfFuel)
+            {
+                isOutOfFuel = true;
+                isGameOverTriggered = true;
+                currentMotorSpeed = 0f;
+                DisableMotors();
+                if (GameUIManager.instance != null)
+                {
+                    GameUIManager.instance.ShowGameOver();
+                }
+            }
+        }
 
         float input = Input.GetAxisRaw("Horizontal");
 
@@ -117,6 +183,17 @@ public class PlayerController : MonoBehaviour
     {
         if (backWheelJoint != null) backWheelJoint.useMotor = false;
         if (frontWheelJoint != null) frontWheelJoint.useMotor = false;
+    }
+
+    public void RestoreFuel(float amount)
+    {
+        if (isOutOfFuel || isGameOverTriggered) return;
+        
+        currentFuel = Mathf.Clamp(currentFuel + amount, 0f, maxFuel);
+        if (fuelSlider != null)
+        {
+            fuelSlider.value = currentFuel;
+        }
     }
 
     void OnDrawGizmosSelected()

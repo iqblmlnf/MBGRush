@@ -20,10 +20,14 @@ public class MainMenuManager : MonoBehaviour
             settingsPanel.SetActive(false);
         }
 
+        // Ambil volume yang tersimpan, jika belum ada gunakan 1.0f (default)
+        float savedVolume = PlayerPrefs.GetFloat("GameVolume", 1.0f);
+        AudioListener.volume = savedVolume;
+
         // Inisialisasi slider volume jika ada
         if (volumeSlider != null)
         {
-            volumeSlider.value = AudioListener.volume;
+            volumeSlider.value = savedVolume;
             volumeSlider.onValueChanged.AddListener(SetVolume);
         }
     }
@@ -64,6 +68,8 @@ public class MainMenuManager : MonoBehaviour
     public void SetVolume(float volume)
     {
         AudioListener.volume = volume;
+        PlayerPrefs.SetFloat("GameVolume", volume);
+        PlayerPrefs.Save(); // Simpan perubahan ke penyimpanan lokal
     }
 
     /// <summary>

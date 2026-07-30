@@ -14,6 +14,14 @@ public class GameManager : MonoBehaviour
         instance = this;
     }
 
+    private void Start()
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = "Score : 0";
+        }
+    }
+
     public void AddScore(int value)
     {
         score += value;

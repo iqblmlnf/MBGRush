@@ -15,11 +15,14 @@ public class Finish : MonoBehaviour
     {
         if (finished) return;
 
-        if (other.CompareTag("Player"))
+        // Deteksi apakah objek atau parent-nya memiliki skrip PlayerController (roda/bodi mobil)
+        PlayerController player = other.GetComponentInParent<PlayerController>();
+
+        if (player != null)
         {
             finished = true;
 
-            Rigidbody2D rb = other.GetComponent<Rigidbody2D>();
+            Rigidbody2D rb = player.GetComponent<Rigidbody2D>();
 
             if (rb != null)
             {
@@ -27,7 +30,10 @@ public class Finish : MonoBehaviour
                 rb.bodyType = RigidbodyType2D.Static;
             }
 
-            audioSource.Play();
+            if (audioSource != null && audioSource.clip != null)
+            {
+                audioSource.Play();
+            }
 
             StartCoroutine(LevelComplete());
         }
@@ -35,8 +41,14 @@ public class Finish : MonoBehaviour
 
     IEnumerator LevelComplete()
     {
-        yield return new WaitForSeconds(audioSource.clip.length);
+        // Menunggu delay singkat (1 detik) setelah menyentuh finish agar terasa natural
+        yield return new WaitForSeconds(1f);
 
         Debug.Log("LEVEL COMPLETE!");
+
+        if (GameUIManager.instance != null)
+        {
+            GameUIManager.instance.ShowVictory(GameManager.instance.GetScore());
+        }
     }
 }

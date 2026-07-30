@@ -58,10 +58,10 @@ cd MBGRush
 
 ## 4. Jalankan Game
 
-Buka Scene:
+Buka Scene utama (Menu Utama) terlebih dahulu:
 
 ```
-Assets/Scenes/Level1.unity
+Assets/Scenes/MainMenu.unity
 ```
 
 Lalu tekan tombol **Play** pada Unity.
@@ -72,9 +72,13 @@ Lalu tekan tombol **Play** pada Unity.
 
 | Tombol | Fungsi |
 |---------|---------|
-| A / ← | Bergerak ke kiri |
-| D / → | Bergerak ke kanan |
-| Space | Melompat |
+| A / ← | Bergerak mundur / ke kiri |
+| D / → | Bergerak maju / ke kanan |
+
+### 🛠️ Fitur Pengujian (Developer Shortcuts)
+Saat menjalankan game di dalam Unity Editor, Anda dapat menggunakan tombol pintas keyboard berikut untuk mempermudah pengujian panel UI:
+*   Tekan **`K`** ➡️ Memicu kondisi **Game Over** secara instan.
+*   Tekan **`L`** ➡️ Memicu kondisi **Misi Selesai / Victory** secara instan.
 
 ---
 

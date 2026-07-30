@@ -21,7 +21,10 @@ public class Coin : MonoBehaviour
     {
         if (collected) return;
 
-        if (other.CompareTag("Player"))
+        // Deteksi apakah objek yang menyentuh koin memiliki skrip PlayerController (misalnya roda)
+        PlayerController player = other.GetComponentInParent<PlayerController>();
+
+        if (player != null)
         {
             collected = true;
 
@@ -30,9 +33,14 @@ public class Coin : MonoBehaviour
             spriteRenderer.enabled = false;
             col.enabled = false;
 
-            audioSource.Play();
+            float destroyDelay = 0.1f;
+            if (audioSource != null && audioSource.clip != null)
+            {
+                audioSource.Play();
+                destroyDelay = audioSource.clip.length;
+            }
 
-            Destroy(gameObject, audioSource.clip.length);
+            Destroy(gameObject, destroyDelay);
         }
     }
 }
