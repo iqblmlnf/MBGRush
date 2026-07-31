@@ -70,10 +70,17 @@ Lalu tekan tombol **Play** pada Unity.
 
 # 🎮 Kontrol
 
+### 💻 Di PC (Keyboard)
 | Tombol | Fungsi |
 |---------|---------|
 | A / ← | Bergerak mundur / ke kiri |
 | D / → | Bergerak maju / ke kanan |
+| Esc / P | Menjeda Permainan (Pause) |
+
+### 📱 Di HP (Layar Sentuh)
+*   **Tombol GAS** (kanan bawah) ➡️ Bergerak maju.
+*   **Tombol REM** (kiri bawah) ➡️ Bergerak mundur / mengerem.
+*   **Tombol Pause `||`** (kanan atas) ➡️ Menjeda permainan.
 
 ### 🛠️ Fitur Pengujian (Developer Shortcuts)
 Saat menjalankan game di dalam Unity Editor, Anda dapat menggunakan tombol pintas keyboard berikut untuk mempermudah pengujian panel UI:
@@ -82,13 +89,14 @@ Saat menjalankan game di dalam Unity Editor, Anda dapat menggunakan tombol pinta
 
 ---
 
-# 🎯 Gameplay
+# 🎯 Fitur & Gameplay
 
-- Kumpulkan seluruh koin.
-- Hindari batu.
-- Jika menabrak batu, level akan diulang.
-- Semua koin wajib diambil sebelum finish.
-- Setelah seluruh koin terkumpul, pemain dapat menyelesaikan level.
+- **Sistem Jalan Acak Otomatis (Endless Track)**: Jalan dihasilkan secara acak di depan mobil secara dinamis.
+- **Sistem Bensin (Fuel System)**: Bensin berkurang terus-menerus dan wajib diisi ulang dengan mengambil jerigen bensin di jalan agar tidak kehabisan bensin (Game Over).
+- **Pengukur Jarak (Distance Meter)**: Menghitung jarak tempuh mobil dalam satuan meter secara real-time.
+- **Deteksi Mobil Terguling**: Jika mobil terbalik lebih dari 0.8 detik, permainan akan berakhir (Game Over).
+- **Koleksi Koin (Score)**: Ambil koin emas di sepanjang jalan untuk meningkatkan skor Anda.
+- **Penyimpanan Volume**: Pengaturan volume suara di menu utama tersimpan secara permanen menggunakan `PlayerPrefs`.
 
 ---
 
