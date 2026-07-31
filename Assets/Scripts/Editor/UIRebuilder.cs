@@ -43,11 +43,11 @@ public class UIRebuilder : EditorWindow
         Canvas canvas = canvasObj.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
 
-        CanvasScaler scaler = canvasObj.GetComponent<CanvasScaler>();
+    CanvasScaler scaler = canvasObj.GetComponent<CanvasScaler>();
         scaler.uiScaleMode = CanvasScaler.ScaleMode.ScaleWithScreenSize;
         scaler.referenceResolution = new Vector2(1920, 1080);
         scaler.screenMatchMode = CanvasScaler.ScreenMatchMode.MatchWidthOrHeight;
-        scaler.matchWidthOrHeight = 0.5f;
+        scaler.matchWidthOrHeight = 1f; // Cocokkan tinggi layar (Wajib untuk game landscape agar tidak terpotong)
 
         // Buat EventSystem jika belum ada di scene
         if (GameObject.FindObjectOfType<UnityEngine.EventSystems.EventSystem>() == null)
@@ -63,24 +63,24 @@ public class UIRebuilder : EditorWindow
         hudPanel.GetComponent<RectTransform>().offsetMin = Vector2.zero;
         hudPanel.GetComponent<RectTransform>().offsetMax = Vector2.zero;
 
-        // Score Text
+        // Score Text - Diberi margin X=60, Y=-50 agar terhindar dari poni (notch) HP
         GameObject scoreTextObj = CreateText(hudPanel, "ScoreText", "Score : 0", 36, Color.white, TextAlignmentOptions.Left);
-        SetRect(scoreTextObj, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(20f, -20f), new Vector2(300f, 50f));
+        SetRect(scoreTextObj, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(60f, -50f), new Vector2(300f, 50f));
         scoreTextObj.GetComponent<RectTransform>().pivot = new Vector2(0f, 1f);
 
         // Distance Text
         GameObject distanceTextObj = CreateText(hudPanel, "DistanceText", "0 m", 30, Color.yellow, TextAlignmentOptions.Left);
-        SetRect(distanceTextObj, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(20f, -75f), new Vector2(300f, 50f));
+        SetRect(distanceTextObj, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(60f, -105f), new Vector2(300f, 50f));
         distanceTextObj.GetComponent<RectTransform>().pivot = new Vector2(0f, 1f);
 
         // Fuel Slider
         GameObject sliderObj = CreateSlider(hudPanel, "FuelSlider");
-        SetRect(sliderObj, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(20f, -140f), new Vector2(250f, 25f));
+        SetRect(sliderObj, new Vector2(0f, 1f), new Vector2(0f, 1f), new Vector2(60f, -170f), new Vector2(250f, 25f));
         sliderObj.GetComponent<RectTransform>().pivot = new Vector2(0f, 1f);
 
-        // Pause Button on HUD
+        // Pause Button on HUD - Diberi margin kanan X=-80, Y=-50 agar aman dari sudut melengkung HP
         GameObject pauseBtnObj = CreateButton(hudPanel, "PauseButton", "||", 24, Color.white, Color.white);
-        SetRect(pauseBtnObj, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-20f, -20f), new Vector2(60f, 60f));
+        SetRect(pauseBtnObj, new Vector2(1f, 1f), new Vector2(1f, 1f), new Vector2(-80f, -50f), new Vector2(60f, 60f));
         pauseBtnObj.GetComponent<RectTransform>().pivot = new Vector2(1f, 1f);
         
         // Coba load sprite ikon pause kustom jika ada di aset
