@@ -106,7 +106,7 @@ public class PlayerController : MonoBehaviour
             }
         }
 
-        float input = Input.GetAxisRaw("Horizontal");
+        float input = GetInput();
 
         // Kelola suara mesin dengan kehalusan pitch
         if (engineAudio != null)
@@ -128,7 +128,7 @@ public class PlayerController : MonoBehaviour
 
     void FixedUpdate()
     {
-        float input = Input.GetAxisRaw("Horizontal");
+        float input = GetInput();
 
         if (isFlipped)
         {
@@ -183,6 +183,24 @@ public class PlayerController : MonoBehaviour
     {
         if (backWheelJoint != null) backWheelJoint.useMotor = false;
         if (frontWheelJoint != null) frontWheelJoint.useMotor = false;
+    }
+
+    private float mobileInput = 0f;
+
+    public void SetMobileInput(float val)
+    {
+        mobileInput = val;
+    }
+
+    private float GetInput()
+    {
+        float keyboardInput = Input.GetAxisRaw("Horizontal");
+        // Jika tombol mobile ditekan, prioritaskan input mobile
+        if (mobileInput != 0f)
+        {
+            return mobileInput;
+        }
+        return keyboardInput;
     }
 
     public void RestoreFuel(float amount)

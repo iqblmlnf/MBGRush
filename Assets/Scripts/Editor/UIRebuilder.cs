@@ -101,6 +101,21 @@ public class UIRebuilder : EditorWindow
         // Hubungkan tombol pause secara permanen di Editor
         UnityEventTools.AddPersistentListener(pauseBtnObj.GetComponent<Button>().onClick, gameUI.TogglePause);
 
+        // --- TOMBOL VIRTUAL INPUT MOBILE ---
+        // Tombol Rem (Mundur/Kiri) di kiri bawah
+        GameObject brakeBtnObj = CreateButton(hudPanel, "BrakeButton", "REM", 28, new Color(0.3f, 0.3f, 0.3f, 0.7f), Color.white);
+        SetRect(brakeBtnObj, new Vector2(0f, 0f), new Vector2(0f, 0f), new Vector2(150f, 150f), new Vector2(180f, 120f));
+        brakeBtnObj.GetComponent<RectTransform>().pivot = new Vector2(0.5f, 0.5f);
+        VirtualButton brakeVB = brakeBtnObj.AddComponent<VirtualButton>();
+        brakeVB.buttonType = "Brake";
+
+        // Tombol Gas (Maju/Kanan) di kanan bawah
+        GameObject gasBtnObj = CreateButton(hudPanel, "GasButton", "GAS", 28, new Color(0.2f, 0.6f, 0.2f, 0.8f), Color.white);
+        SetRect(gasBtnObj, new Vector2(1f, 0f), new Vector2(1f, 0f), new Vector2(-150f, 150f), new Vector2(180f, 120f));
+        gasBtnObj.GetComponent<RectTransform>().pivot = new Vector2(0.5f, 0.5f);
+        VirtualButton gasVB = gasBtnObj.AddComponent<VirtualButton>();
+        gasVB.buttonType = "Gas";
+
         // 5. BUAT GAME OVER PANEL
         GameObject goPanel = CreatePanel(canvasObj, "GameOverPanel", new Color(0.12f, 0.12f, 0.12f, 0.9f));
         SetRect(goPanel, Vector2.zero, Vector2.one, Vector2.zero, Vector2.zero); // Full Screen
