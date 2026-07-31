@@ -13,6 +13,8 @@ public class GameUIManager : MonoBehaviour
 
     [Header("UI Text")]
     public TMP_Text victoryScoreText;
+    public TMP_Text gameOverScoreText;
+    public TMP_Text gameOverDistanceText;
 
     private bool isPaused = false;
 
@@ -106,6 +108,23 @@ public class GameUIManager : MonoBehaviour
         {
             gameOverPanel.SetActive(true);
         }
+        else
+        {
+            Debug.LogWarning("[GameUIManager] gameOverPanel belum dihubungkan di Inspector UIManager!");
+        }
+
+        if (GameManager.instance != null)
+        {
+            if (gameOverScoreText != null)
+            {
+                gameOverScoreText.text = "Score: " + GameManager.instance.GetScore();
+            }
+            if (gameOverDistanceText != null)
+            {
+                gameOverDistanceText.text = "Distance: " + GameManager.instance.GetDistance() + " m";
+            }
+        }
+
         // Jeda waktu permainan
         Time.timeScale = 0f;
     }

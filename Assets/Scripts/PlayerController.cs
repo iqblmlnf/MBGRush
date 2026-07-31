@@ -18,9 +18,9 @@ public class PlayerController : MonoBehaviour
 
     [Header("Stability Settings")]
     [Tooltip("Sudut kemiringan maksimal sebelum mobil dianggap terbalik (derajat)")]
-    public float maxTiltAngle = 80f;
+    public float maxTiltAngle = 65f;
     [Tooltip("Kekuatan torsi penyeimbang agar bodi mobil stabil tegak")]
-    public float uprightStiffness = 6f;
+    public float uprightStiffness = 1.5f;
 
     [Header("Audio")]
     public AudioSource engineAudio;
@@ -34,7 +34,7 @@ public class PlayerController : MonoBehaviour
 
     [Header("Game Over Settings")]
     [Tooltip("Waktu (detik) posisi terbalik sebelum Game Over muncul")]
-    public float timeToGameOverWhenFlipped = 1.8f;
+    public float timeToGameOverWhenFlipped = 0.8f;
 
     [Header("Fuel Settings")]
     [Tooltip("Kapasitas bensin maksimal")]
