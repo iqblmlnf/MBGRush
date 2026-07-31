@@ -14,10 +14,38 @@ public class MainMenuManager : MonoBehaviour
 
     void Start()
     {
+        // Cari panel settings secara otomatis jika kosong
+        if (settingsPanel == null)
+        {
+            settingsPanel = GameObject.Find("SettingsPanel");
+            if (settingsPanel == null) settingsPanel = GameObject.Find("Settings");
+            if (settingsPanel == null)
+            {
+                // Cari objek non-aktif secara rekursif di canvas
+                Canvas canvas = GameObject.FindObjectOfType<Canvas>();
+                if (canvas != null)
+                {
+                    Transform t = canvas.transform.Find("SettingsPanel");
+                    if (t == null) t = canvas.transform.Find("Settings");
+                    if (t != null) settingsPanel = t.gameObject;
+                }
+            }
+        }
+
         // Sembunyikan panel settings saat pertama kali terbuka
         if (settingsPanel != null)
         {
             settingsPanel.SetActive(false);
+        }
+
+        // Cari slider volume secara otomatis jika kosong
+        if (volumeSlider == null)
+        {
+            volumeSlider = GameObject.FindObjectOfType<Slider>(true);
+            if (volumeSlider == null && settingsPanel != null)
+            {
+                volumeSlider = settingsPanel.GetComponentInChildren<Slider>(true);
+            }
         }
 
         // Ambil volume yang tersimpan, jika belum ada gunakan 1.0f (default)
@@ -28,7 +56,13 @@ public class MainMenuManager : MonoBehaviour
         if (volumeSlider != null)
         {
             volumeSlider.value = savedVolume;
+            volumeSlider.onValueChanged.RemoveAllListeners();
             volumeSlider.onValueChanged.AddListener(SetVolume);
+            Debug.Log("[MainMenuManager] Berhasil mendeteksi volumeSlider secara otomatis: " + volumeSlider.gameObject.name);
+        }
+        else
+        {
+            Debug.LogWarning("[MainMenuManager] volumeSlider tidak ditemukan di scene MainMenu!");
         }
     }
 
@@ -70,6 +104,7 @@ public class MainMenuManager : MonoBehaviour
         AudioListener.volume = volume;
         PlayerPrefs.SetFloat("GameVolume", volume);
         PlayerPrefs.Save(); // Simpan perubahan ke penyimpanan lokal
+        Debug.Log("[MainMenuManager] Volume diubah ke: " + volume + " | AudioListener.volume: " + AudioListener.volume);
     }
 
     /// <summary>
