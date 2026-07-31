@@ -72,6 +72,7 @@ public class GameUIManager : MonoBehaviour
 
     public void TogglePause()
     {
+        Debug.Log("[GameUIManager] TogglePause() dipanggil via klik/keyboard! Status isPaused saat ini: " + isPaused);
         if (isPaused)
         {
             ResumeGame();
@@ -84,6 +85,7 @@ public class GameUIManager : MonoBehaviour
 
     public void PauseGame()
     {
+        Debug.Log("[GameUIManager] PauseGame() dipanggil! Mengaktifkan panel: " + (pausePanel != null ? pausePanel.name : "NULL"));
         isPaused = true;
         if (pausePanel != null)
         {
@@ -94,6 +96,7 @@ public class GameUIManager : MonoBehaviour
 
     public void ResumeGame()
     {
+        Debug.Log("[GameUIManager] ResumeGame() dipanggil! Menonaktifkan panel: " + (pausePanel != null ? pausePanel.name : "NULL"));
         isPaused = false;
         if (pausePanel != null)
         {
@@ -174,4 +177,5 @@ public class GameUIManager : MonoBehaviour
         Time.timeScale = 1f;
         SceneManager.LoadScene("MainMenu");
     }
+
 }
